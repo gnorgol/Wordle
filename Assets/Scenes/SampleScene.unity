@@ -5531,8 +5531,25 @@ MonoBehaviour:
   maxAttempts: 6
   wordLength: 5
   wordList:
-  - teste
-  - test
+  - noel
+  - cadeau
+  - Sapin
+  - Neige
+  - Etoile
+  - Bonhomme
+  - Renne
+  - Givre
+  - Lutin
+  - Guirlande
+  - Bougie
+  - Chocolat
+  - Reveillon
+  - Traineau
+  - Magie
+  - Surprise
+  - Houx
+  - Jouet
+  - Etoile
   letterSlotPrefab: {fileID: 5462147752977328585, guid: b392471d7fe81c647a14c3703b7c36a8, type: 3}
   gridParent: {fileID: 1324232073}
   keyboardButtons:

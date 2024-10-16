@@ -47,6 +47,9 @@ public class WordleGame : MonoBehaviour
     }
     public void RestartGame()
     {
+        // Deselect any selected game object to prevent keyboard input on the restart button
+        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+
         InitializeGame();
         //Destroy current grid
         foreach (List<GameObject> row in letterSlots)
