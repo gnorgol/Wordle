@@ -22,6 +22,7 @@ public class WordleGame : MonoBehaviour
     void Start()
     {
         InitializeGame();
+        InitializeKeyboard();
         CreateGrid();
     }
 
@@ -29,6 +30,14 @@ public class WordleGame : MonoBehaviour
     {
         targetWord = GetRandomWord().ToUpper();
         attemptsText.text = "Tentatives restantes : " + (maxAttempts - currentAttempt);
+    }
+    void InitializeKeyboard()
+    {
+        foreach (Button button in keyboardButtons)
+        {
+            string letter = button.GetComponentInChildren<TMP_Text>().text;
+            button.onClick.AddListener(() => OnKeyboardButtonPressed(letter));
+        }
     }
 
     void CreateGrid()
