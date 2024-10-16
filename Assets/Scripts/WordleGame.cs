@@ -19,6 +19,8 @@ public class WordleGame : MonoBehaviour
     public List<List<GameObject>> letterSlots = new List<List<GameObject>>(); // Pour stocker les cases de la grille
     public string currentGuess = "";
 
+    private bool gameEnded = false;
+
     void Start()
     {
         InitializeGame();
@@ -28,6 +30,7 @@ public class WordleGame : MonoBehaviour
 
     void InitializeGame()
     {
+        gameEnded = false;
         targetWord = GetRandomWord().ToUpper();
         currentGuess = "";
         currentAttempt = 0;
@@ -50,7 +53,6 @@ public class WordleGame : MonoBehaviour
         {
             foreach (GameObject slot in row)
             {
-                Debug.Log("Destroying slot");
                 Destroy(slot);
             }
         }
@@ -83,7 +85,7 @@ public class WordleGame : MonoBehaviour
     }
     void Update()
     {
-        if (Input.anyKeyDown)
+        if (Input.anyKeyDown && !gameEnded)
         {
             string inputString = Input.inputString.ToUpper();
 
@@ -107,7 +109,7 @@ public class WordleGame : MonoBehaviour
 
     public void OnKeyboardButtonPressed(string letter)
     {
-        if (currentGuess.Length < wordLength)
+        if (currentGuess.Length < wordLength && !gameEnded)
         {
             currentGuess += letter;
             UpdateGridDisplay();
@@ -116,9 +118,13 @@ public class WordleGame : MonoBehaviour
 
     public void OnEnterButtonPressed()
     {
-        if (currentGuess.Length == wordLength)
+        if (currentGuess.Length == wordLength && !gameEnded)
         {
             CheckGuess();
+            if (gameEnded)
+            {
+                return;
+            }
             currentGuess = "";
             currentAttempt++;
             attemptsText.text = "Tentatives restantes : " + (maxAttempts - currentAttempt);
@@ -126,22 +132,27 @@ public class WordleGame : MonoBehaviour
             if (currentAttempt >= maxAttempts)
             {
                 attemptsText.text = "Jeu terminé ! Le mot était : " + targetWord;
+                gameEnded = true;
             }
         }
     }
 
     void UpdateGridDisplay()
     {
-        // Clear all slots in the current attempt row
-        for (int i = 0; i < wordLength; i++)
+        // Ensure currentAttempt is within bounds
+        if (currentAttempt < letterSlots.Count)
         {
-            letterSlots[currentAttempt][i].GetComponentInChildren<Text>().text = "";
-        }
+            // Clear all slots in the current attempt row
+            for (int i = 0; i < wordLength; i++)
+            {
+                letterSlots[currentAttempt][i].GetComponentInChildren<Text>().text = "";
+            }
 
-        // Update slots with the current guess
-        for (int i = 0; i < currentGuess.Length; i++)
-        {
-            letterSlots[currentAttempt][i].GetComponentInChildren<Text>().text = currentGuess[i].ToString();
+            // Update slots with the current guess
+            for (int i = 0; i < currentGuess.Length; i++)
+            {
+                letterSlots[currentAttempt][i].GetComponentInChildren<Text>().text = currentGuess[i].ToString();
+            }
         }
     }
 
@@ -166,11 +177,16 @@ public class WordleGame : MonoBehaviour
                 slotImage.color = Color.gray;
             }
         }
+        if (currentGuess == targetWord)
+        {
+            attemptsText.text = "Bravo ! Vous avez trouvé le mot : " + targetWord;
+            gameEnded = true;
+        }
     }
 
     public void OnBackspaceButtonPressed()
     {
-        if (currentGuess.Length > 0)
+        if (currentGuess.Length > 0 && !gameEnded)
         {
             currentGuess = currentGuess.Substring(0, currentGuess.Length - 1);
             UpdateGridDisplay();
