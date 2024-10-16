@@ -16,7 +16,7 @@ public class WordleGame : MonoBehaviour
 
     private string targetWord;
     private int currentAttempt = 0;
-    private List<List<GameObject>> letterSlots = new List<List<GameObject>>(); // Pour stocker les cases de la grille
+    public List<List<GameObject>> letterSlots = new List<List<GameObject>>(); // Pour stocker les cases de la grille
     public string currentGuess = "";
 
     void Start()
@@ -29,6 +29,9 @@ public class WordleGame : MonoBehaviour
     void InitializeGame()
     {
         targetWord = GetRandomWord().ToUpper();
+        currentGuess = "";
+        currentAttempt = 0;
+        wordLength = targetWord.Length;
         attemptsText.text = "Tentatives restantes : " + (maxAttempts - currentAttempt);
     }
     void InitializeKeyboard()
@@ -39,9 +42,29 @@ public class WordleGame : MonoBehaviour
             button.onClick.AddListener(() => OnKeyboardButtonPressed(letter));
         }
     }
+    public void RestartGame()
+    {
+        InitializeGame();
+        //Destroy current grid
+        foreach (List<GameObject> row in letterSlots)
+        {
+            foreach (GameObject slot in row)
+            {
+                Debug.Log("Destroying slot");
+                Destroy(slot);
+            }
+        }
+        letterSlots.Clear();
+        CreateGrid();
+        UpdateGridDisplay();
+    }
 
     void CreateGrid()
     {
+
+        //change constraints of the grid layout group
+        GridLayoutGroup gridLayout = gridParent.GetComponent<GridLayoutGroup>();
+        gridLayout.constraintCount = wordLength;
         for (int i = 0; i < maxAttempts; i++)
         {
             List<GameObject> row = new List<GameObject>();
@@ -62,25 +85,21 @@ public class WordleGame : MonoBehaviour
     {
         if (Input.anyKeyDown)
         {
-            foreach (KeyCode keyCode in System.Enum.GetValues(typeof(KeyCode)))
-            {
-                if (Input.GetKeyDown(keyCode))
-                {
-                    string keyPressed = keyCode.ToString().ToUpper();
+            string inputString = Input.inputString.ToUpper();
 
-                    // Vérifie si c'est une lettre entre A et Z
-                    if (keyPressed.Length == 1 && keyPressed[0] >= 'A' && keyPressed[0] <= 'Z')
-                    {
-                        OnKeyboardButtonPressed(keyPressed);
-                    }
-                    else if (keyCode == KeyCode.Return) // Touche Entrée
-                    {
-                        OnEnterButtonPressed();
-                    }
-                    else if (keyCode == KeyCode.Backspace) // Touche Retour Arrière
-                    {
-                        OnBackspaceButtonPressed();
-                    }
+            foreach (char c in inputString)
+            {
+                if (c >= 'A' && c <= 'Z')
+                {
+                    OnKeyboardButtonPressed(c.ToString());
+                }
+                else if (c == '\n' || c == '\r') // Touche Entrée
+                {
+                    OnEnterButtonPressed();
+                }
+                else if (c == '\b') // Touche Retour Arrière
+                {
+                    OnBackspaceButtonPressed();
                 }
             }
         }
